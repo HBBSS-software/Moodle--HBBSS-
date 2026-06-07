@@ -1,0 +1,101 @@
+# HBBSS 账号管理系统 - Docker Compose配置
+
+# 使用方法:
+#   docker-compose up -d
+
+version: '3.8'
+
+services:
+  # 账号管理系统
+  hbbss-account:
+    build: .
+    container_name: hbbss-account
+    hostname: hbbss-account
+    
+    # 端口映射
+    ports:
+      - "5000:5000"
+    
+    # 环境变量
+    environment:
+      - FLASK_ENV=production
+      - DEBUG=False
+      - PORT=5000
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-your-secret-key-change-this}
+      - DATABASE_URL=sqlite:///accounts.db
+      - LOG_LEVEL=INFO
+      - ALLOWED_IPS=127.0.0.1,124.222.116.32
+    
+    # 数据卷
+    volumes:
+      - ./accounts.db:/app/accounts.db
+      - ./logs:/app/logs
+    
+    # 自动重启
+    restart: unless-stopped
+    
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # 健康检查
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+  
+  # Nginx反向代理（可选）
+  nginx:
+    image: nginx:alpine
+    container_name: hbbss-nginx
+    hostname: hbbss-nginx
+    
+    # 端口映射
+    ports:
+      - "80:80"
+      # - "443:443"
+    
+    # 配置卷
+    volumes:
+      - ./nginx.conf.example:/etc/nginx/conf.d/default.conf:ro
+      # - ./ssl/certs:/etc/nginx/certs:ro
+    
+    # 依赖关系
+    depends_on:
+      - hbbss-account
+    
+    # 自动重启
+    restart: unless-stopped
+    
+    # 日志配置
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# 卷定义
+volumes:
+  accounts_db:
+    driver: local
+
+# 网络定义
+networks:
+  default:
+    name: hbbss-network
+    driver: bridge
