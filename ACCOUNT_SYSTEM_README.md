@@ -63,19 +63,90 @@
 
 ## 快速开始
 
-### 本地开发环境
+### Windows 用户
 
+#### 方法一：使用自动化脚本（推荐）
 ```bash
-# 1. 安装依赖
+# 1. 运行设置脚本（自动安装依赖、初始化数据库、创建管理员）
+setup.bat
+
+# 2. 启动服务器
+python server.py
+
+# 3. 打开浏览器访问
+http://localhost:5000/api/health
+
+# 4. 在另一个终端测试API
+python test_server.py
+```
+
+#### 方法二：手动配置
+```bash
+# 1. 创建虚拟环境
+python -m venv venv
+
+# 2. 激活虚拟环境
+venv\Scripts\activate.bat
+
+# 3. 安装依赖包
 pip install -r requirements-server.txt
 
-# 2. 创建.env文件
+# 4. 创建.env配置文件
+copy .env.example .env
+
+# 5. 初始化数据库
+python -c "from server import app, db; app.app_context().push(); db.create_all()"
+
+# 6. 创建管理员账号
+python -c ^
+"from server import app, db, User; ctx = app.app_context(); ctx.push(); ^
+admin = User(username='admin', email='admin@hbbss.com', is_admin=True, is_active=True); ^
+admin.set_password('admin-password'); db.session.add(admin); db.session.commit(); ^
+print('管理员创建成功')"
+
+# 7. 启动服务器
+python server.py
+
+# 8. 测试API（另开一个终端）
+python test_server.py
+```
+
+### Linux / Mac 用户
+
+#### 方法一：使用自动化脚本（推荐）
+```bash
+# 1. 给脚本执行权限并运行
+chmod +x setup.sh
+./setup.sh
+
+# 2. 启动服务器
+python3 server.py
+
+# 3. 打开浏览器访问
+http://localhost:5000/api/health
+
+# 4. 在另一个终端测试API
+python3 test_server.py
+```
+
+#### 方法二：手动配置
+```bash
+# 1. 创建虚拟环境
+python3 -m venv venv
+
+# 2. 激活虚拟环境
+source venv/bin/activate
+
+# 3. 安装依赖包
+pip install -r requirements-server.txt
+
+# 4. 创建.env配置文件
 cp .env.example .env
 
-# 3. 初始化数据库
+# 5. 初始化数据库
 python3 -c "from server import app, db; app.app_context().push(); db.create_all()"
 
-# 4. 创建管理员账号
+# 6. 创建管理员账号
 python3 << 'EOF'
 from server import app, db, User
 with app.app_context():
@@ -91,11 +162,27 @@ with app.app_context():
     print("管理员创建成功")
 EOF
 
-# 5. 启动开发服务器
+# 7. 启动服务器
 python3 server.py
 
-# 6. 在另一个终端测试API
+# 8. 测试API（另开一个终端）
 python3 test_server.py
+```
+
+### Docker 方式（推荐用于生产）
+
+```bash
+# 1. 启动Docker容器
+docker-compose up -d
+
+# 2. 查看服务日志
+docker-compose logs -f
+
+# 3. 访问服务
+http://localhost:5000
+
+# 4. 停止服务
+docker-compose down
 ```
 
 ### 生产部署
