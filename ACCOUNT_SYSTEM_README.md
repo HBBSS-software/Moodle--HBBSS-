@@ -61,128 +61,225 @@
 | `DEPLOYMENT.md` | 详细部署指南 |
 | `accounts.db` | SQLite数据库（自动创建） |
 
-## 快速开始
+## 运行说明
 
-### Windows 用户
+下面是最详细的运行说明，直接复制即可使用。
 
-#### 方法一：使用自动化脚本（推荐）
-```bash
-# 1. 运行设置脚本（自动安装依赖、初始化数据库、创建管理员）
+### 1. 系统要求
+
+- Python 3.9 及以上
+- pip 可用
+- Windows / Linux / macOS 均可运行
+- 如果在服务器上运行，建议使用 `124.222.116.32:5000` 作为默认地址
+
+### 2. Windows 直接运行（推荐）
+
+```powershell
+# 1. 进入项目目录
+cd D:\Moodle-HBBSS-\Moodle--HBBSS-
+
+# 2. 运行自动化设置脚本
 setup.bat
 
-# 2. 启动服务器
+# 3. 启动程序
 python server.py
 
-# 3. 打开浏览器访问
+# 4. 打开浏览器访问
 http://localhost:5000/api/health
+```
 
-# 4. 在另一个终端测试API
+如果你想测试API，请打开另一个命令行窗口：
+
+```powershell
+cd D:\Moodle-HBBSS-\Moodle--HBBSS-
 python test_server.py
 ```
 
-#### 方法二：手动配置
+### 3. Linux / macOS 直接运行（推荐）
+
 ```bash
-# 1. 创建虚拟环境
-python -m venv venv
-
-# 2. 激活虚拟环境
-venv\Scripts\activate.bat
-
-# 3. 安装依赖包
-pip install -r requirements-server.txt
-
-# 4. 创建.env配置文件
-copy .env.example .env
-
-# 5. 初始化数据库
-python -c "from server import app, db; app.app_context().push(); db.create_all()"
-
-# 6. 创建管理员账号
-python -c ^
-"from server import app, db, User; ctx = app.app_context(); ctx.push(); ^
-admin = User(username='admin', email='admin@hbbss.com', is_admin=True, is_active=True); ^
-admin.set_password('admin-password'); db.session.add(admin); db.session.commit(); ^
-print('管理员创建成功')"
-
-# 7. 启动服务器
-python server.py
-
-# 8. 测试API（另开一个终端）
-python test_server.py
-```
-
-### Linux / Mac 用户
-
-#### 方法一：使用自动化脚本（推荐）
-```bash
-# 1. 给脚本执行权限并运行
+cd /path/to/Moodle--HBBSS-
 chmod +x setup.sh
 ./setup.sh
-
-# 2. 启动服务器
 python3 server.py
+```
 
-# 3. 打开浏览器访问
+访问服务：
+
+```bash
 http://localhost:5000/api/health
+```
 
-# 4. 在另一个终端测试API
+测试API：
+
+```bash
+cd /path/to/Moodle--HBBSS-
 python3 test_server.py
 ```
 
-#### 方法二：手动配置
-```bash
-# 1. 创建虚拟环境
-python3 -m venv venv
+### 4. 手动安装步骤（用于调试或自定义）
 
-# 2. 激活虚拟环境
-source venv/bin/activate
+#### Windows 手动步骤
 
-# 3. 安装依赖包
+```powershell
+cd D:\Moodle-HBBSS-\Moodle--HBBSS-
+python -m venv venv
+venv\Scripts\activate.bat
 pip install -r requirements-server.txt
+copy .env.example .env
+python -c "from server import app, db; app.app_context().push(); db.create_all()"
+```
 
-# 4. 创建.env配置文件
-cp .env.example .env
+创建管理员账号：
 
-# 5. 初始化数据库
-python3 -c "from server import app, db; app.app_context().push(); db.create_all()"
-
-# 6. 创建管理员账号
-python3 << 'EOF'
+```powershell
+python - <<'PY'
 from server import app, db, User
 with app.app_context():
-    admin = User(
-        username='admin',
-        email='admin@hbbss.com',
-        is_admin=True,
-        is_active=True
-    )
+    admin = User(username='admin', email='admin@hbbss.com', is_admin=True, is_active=True)
+    admin.set_password('admin-password')
+    db.session.add(admin)
+    db.session.commit()
+    print('管理员创建成功')
+PY
+```
+
+启动服务：
+
+```powershell
+python server.py
+```
+
+#### Linux / macOS 手动步骤
+
+```bash
+cd /path/to/Moodle--HBBSS-
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-server.txt
+cp .env.example .env
+python3 -c "from server import app, db; app.app_context().push(); db.create_all()"
+```
+
+创建管理员账号：
+
+```bash
+python3 <<'EOF'
+from server import app, db, User
+with app.app_context():
+    admin = User(username='admin', email='admin@hbbss.com', is_admin=True, is_active=True)
     admin.set_password('admin-password')
     db.session.add(admin)
     db.session.commit()
     print("管理员创建成功")
 EOF
-
-# 7. 启动服务器
-python3 server.py
-
-# 8. 测试API（另开一个终端）
-python3 test_server.py
 ```
+
+启动服务：
+
+```bash
+python3 server.py
+```
+
+### 5. Docker 运行
+
+```bash
+docker-compose up -d
+```
+
+访问服务：
+
+```bash
+http://localhost:5000
+```
+
+停止服务：
+
+```bash
+docker-compose down
+```
+
+### 6. 服务器运行（放到 124.222.116.32）
+
+如果你已经把项目上传到服务器，可按下面步骤运行：
+
+```bash
+cd /home/ubuntu/hbbss-account-system
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements-server.txt
+cp .env.example .env
+python3 -c "from server import app, db; app.app_context().push(); db.create_all()"
+python3 server.py
+```
+
+它将在服务器的 `5000` 端口启动，访问地址为：
+
+```bash
+http://124.222.116.32:5000
+```
+
+### 7. 运行后检查
+
+- 健康检查：
+  - `http://localhost:5000/api/health`
+- 管理员登录：
+  - POST `/api/auth/login`
+- 如果是远程服务器，请将 `localhost` 替换为 `124.222.116.32`
+
+### 8. 重要提示
+
+- 默认管理员账号为 `admin`，密码 `admin-password`，请启动后立即修改
+- `.env` 文件内可配置 `PORT`、`JWT_SECRET_KEY`、`ALLOWED_IPS`
+- 本地访问建议使用 `http://localhost:5000`
+- 服务器上访问建议使用 `http://124.222.116.32:5000`
+
+### 9. 常见运行命令
+
+```bash
+# 启动服务
+python server.py
+
+# 启动服务并打印日志
+python server.py
+
+# 使用Gunicorn启动（生产部署）
+gunicorn -w 4 -b 0.0.0.0:5000 server:app
+
+# 运行测试脚本
+python test_server.py
+```
+
+### 10. 运行环境变量
+
+`.env` 示例中默认包含：
+
+```text
+PORT=5000
+HOST=0.0.0.0
+JWT_SECRET_KEY=your-secret-key-here-change-this
+DATABASE_URL=sqlite:///accounts.db
+ALLOWED_IPS=127.0.0.1,124.222.116.32
+```
+
+### 11. 如果你要在服务器上长期挂载
+
+建议使用 `gunicorn` 或 `docker-compose`，并配合 Nginx 反向代理。详见 [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### 12. 直接运行说明总结
+
+1. 进入项目目录
+2. 启动虚拟环境
+3. 安装依赖
+4. 初始化数据库
+5. 创建管理员账号
+6. 运行 `python server.py`
+7. 访问 `http://localhost:5000/api/health`
 
 ### Docker 方式（推荐用于生产）
 
 ```bash
-# 1. 启动Docker容器
 docker-compose up -d
-
-# 2. 查看服务日志
-docker-compose logs -f
-
-# 3. 访问服务
-http://localhost:5000
-
-# 4. 停止服务
-docker-compose down
 ```
 
 ### 生产部署

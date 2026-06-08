@@ -30,6 +30,15 @@ Moodle is Free, and Open Source software. You can easily [download Moodle][9] an
 
 Moodle also offers hosting through both [MoodleCloud][11], and our [partner network][10].
 
+## HBBSS 账号管理系统
+
+本仓库包含一个独立的账号管理系统，运行和部署说明请直接查看：
+
+- `ACCOUNT_SYSTEM_README.md`
+- `DEPLOYMENT.md`
+
+如果你想直接运行本项目，请打开 `ACCOUNT_SYSTEM_README.md`，其中包含详细的环境配置、启动命令、服务器部署步骤和 API 测试方式。
+
 ## License
 
 Moodle is provided freely as open source software, under version 3 of the GNU General Public License. See our [license page][12] for more information.
